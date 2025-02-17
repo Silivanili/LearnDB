@@ -1,0 +1,44 @@
+@startuml
+
+class Dokument {
+  - id : String
+  - titel : String
+  - beschreibung : String
+  - inhalt : String
+  - erstellungsdatum : DateTime
+  - schlagworte : List<String>
+}
+
+class Autor {
+  - id : String
+  - name : String
+  - email : String
+}
+
+class Karteikarte {
+  - id : String
+  - front : String
+  - back : String
+  - erstellungsdatum : DateTime
+}
+
+class Benutzer {
+  - id : String
+  - name : String
+  - email : String
+  - registrierungsdatum : DateTime
+}
+
+class Topic {
+  - id : String
+  - name : String
+  - beschreibung : String
+}
+
+
+Autor "1..n" --> "1..n" Dokument : "verfasst"
+Dokument "1..n" <--* "1..n" Topic : "gehört zu"
+Karteikarte "0..n" <--* "1" Dokument : "bezieht sich auf"
+Benutzer "1" *--> "0..n" Karteikarte : "besitzt"
+
+@enduml

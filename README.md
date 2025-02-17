@@ -5,7 +5,7 @@
 
 **Use Case Beschreibung**
   
-Die Anwendung soll es ermöglichen, Dokumente (z. B. Vorlesungsunterlagen, Skripte, Übungsblätter) anzulegen, zu bearbeiten, abzurufen und zu löschen. Zusätzlich soll eine einfache Suchfunktion integriert werden, um relevante Dokumente anhand von Metadaten (z. B. Titel, Schlagwörter) schnell zu finden. Um das Projekt agil zu halten werden die Anforderungen in MSCW-Kriterien unterteilt.
+Die Anwendung soll es dem Benutzer ermöglichen, Dokumente (z. B. Vorlesungsunterlagen, Skripte, Übungsblätter) und Topics anzulegen, zu bearbeiten, abzurufen und zu löschen. Zusätzlich soll eine einfache Suchfunktion integriert werden, um relevante Dokumente anhand von Metadaten (z. B. Titel, Schlagwörter) schnell zu finden. Der Benutzer soll aktiv lernen können, etwa durch Karteikarten. Um das Projekt agil zu halten werden die Anforderungen in MSCW-Kriterien unterteilt.
 
 **MSCW-Kriterien**
 
@@ -29,6 +29,12 @@ Die Anwendung soll es ermöglichen, Dokumente (z. B. Vorlesungsunterlagen, Skr
 
 - **Won't Have:**
   - Es wird keine vollwertige Frontend-Benutzeroberfläche entwickelt – der Fokus liegt auf der Backend-Implementierung und der REST-API.
+
+
+**UML-Klassendiagramm**
+Hier ist das momentane Klassendiagramm
+![UML-Diagramm](out/Klassendiagramm/Klassendiagramm.png)
+
 
 **Techstack**
 - FastAPI
