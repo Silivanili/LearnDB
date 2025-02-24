@@ -1,44 +1,58 @@
 @startuml
 
 class Dokument {
-  - id : String
+  - document_id : Integer
   - titel : String
   - beschreibung : String
   - inhalt : String
   - erstellungsdatum : DateTime
-  - schlagworte : List<String>
+  - schlagworte : List
+  - kurs : String
 }
 
 class Autor {
-  - id : String
+  - autor_id : Integer
   - name : String
   - email : String
 }
 
 class Karteikarte {
-  - id : String
-  - front : String
-  - back : String
+  - kartei_id : Integer
+  - frage : String
+  - antwort : String
   - erstellungsdatum : DateTime
+  - kategorie : String
 }
 
 class Benutzer {
-  - id : String
+  - benutzer_id : Integer
   - name : String
   - email : String
-  - registrierungsdatum : DateTime
+}
+
+class Kurs {
+  kurs_id : Integer
+  name : String
+  beschreibung : String
+  ort : String
+  Zeit : dateTime
+  sonstige_infos : String
 }
 
 class Topic {
-  - id : String
+  - topic_id : Integer
   - name : String
   - beschreibung : String
 }
 
 
-Autor "1..n" --> "1..n" Dokument : "verfasst"
-Dokument "1..n" <--* "1..n" Topic : "gehört zu"
-Karteikarte "0..n" <--* "1" Dokument : "bezieht sich auf"
-Benutzer "1" *--> "0..n" Karteikarte : "besitzt"
+Autor "1..n" --> "1..n" Dokument : verfasst
+Dokument "0..n" <--* "1..n" Topic : gehört zu
+Karteikarte "0..n" <--* "1" Dokument : bezieht sich auf
+Karteikarte "0..n" <--* "1" Topic : bezieht sich auf
+Benutzer "1" *--> "0..n" Karteikarte : besitzt
+Dokument "0..n" <--- "0..1" Kurs : kann haben
+Kurs "0..n" <--- "1..n" Topic : zugehörig
+Karteikarte "0..n" ---> "0..1" Kurs : basiert auf
 
 @enduml

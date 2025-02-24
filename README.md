@@ -1,31 +1,36 @@
 # LearnDB
- Dieses Semesterprojekt soll Lernenden helfen, ihr Wissen in einer Datenbankstruktur zu speichern und zu verwalten. Aktives Lernen soll auch möglich sein, zunächst in Form von Karteikarten.
-
-
+ Das Ziel des Projekts ist die Entwicklung einer Anwendung, die Lernenden ermöglicht, ihr Wissen in einer NO-SQL Datenbank zu speichern und zu verwalten. Zudem wird eine grundlegende Verwaltung von Kursen ermöglicht. Die Anwendung soll dabei nicht nur passive Speicherung, sondern auch aktives Lernen unterstützen. Dies soll zunächst durch Karteikarten erfolgen. 
 
 **Use Case Beschreibung**
-  
-Die Anwendung soll es dem Benutzer ermöglichen, Dokumente (z. B. Vorlesungsunterlagen, Skripte, Übungsblätter) und Topics anzulegen, zu bearbeiten, abzurufen und zu löschen. Zusätzlich soll eine einfache Suchfunktion integriert werden, um relevante Dokumente anhand von Metadaten (z. B. Titel, Schlagwörter) schnell zu finden. Der Benutzer soll aktiv lernen können, etwa durch Karteikarten. Um das Projekt agil zu halten werden die Anforderungen in MSCW-Kriterien unterteilt.
+Die folgenden Use Cases sind geplant:
+- Dokumentverwaltung: Ein Benutzer legt ein neues Dokument an, fügt es einem Topic und einem Kurs hinzu und sucht später nach diesem Dokument über die Suchfunktion.
+- Kurseinstellung: Ein Benutzer erstellt einen neuen Kurs, fügt ihm Topics und Dokumente zu und suchtmithilfe der Suchfunktion nach relevanten Inhalten für den Kurs.
+- Karteikarten: Ein Benutzer erstellt Karteikarten basierend auf einem Dokument oder Topic eines Kurses und nutzt diese zum Lernen.
+- Suche: Ein Benutzer gibt einen Suchbegriff ein und erhält eine Liste von Dokumenten, die zu diesem Begriff passen.
+         
 
 **MSCW-Kriterien**
 
 - **Must Have:**
-  - Die Anwendung muss CRUD-Operationen für Dokumente unterstützen (Erstellen, Lesen, Aktualisieren, Löschen).
-  - Es muss eine REST-Schnittstelle implementiert werden, die alle CRUD-Operationen sowie eine einfache Suchfunktion bereitstellt.
-  - Die Dokumentdaten müssen in einer NO-SQL-Datenbank gespeichert werden.
-  - Der gesamte Service muss containerisiert sein und verwaltet werden.
-  - Eine ausführliche Dokumentation muss bereitgestellt werden.
-  - Der Code muss in einem Git-Repository sein um ihn klonen zu können.
-
+  - CRUD-Operationen für Dokumente und Topics implementieren.
+  - Erstellung, Lesen, Bearbeiten und Löschung von Kursen sowie Zuweisung von Dokumenten und Topics zu Kursen.
+  - REST-Schnittstelle für alle Operationen bereitstellen, einschließlich Suchfunktion.
+  - Daten in einer NoSQL-Datenbank (MongoDB) speichern.
+  - Anwendung containerisieren (Docker).
+  - Ausführliche Dokumentation liefern.
+  - Code in einem Git-Repository verfügbar machen.
+  - Karteikartenfunktion für aktives Lernen umsetzen.
 
 - **Should Have:**
-  - Die Anwendung soll eine Volltextsuche ermöglichen, sodass Nutzer Dokumente anhand von Titel, Inhalt oder Schlagwörtern filtern können.
-  - Logging und einfache Fehlerbehandlung soll integriert sein, um eine bessere Wartbarkeit zu gewährleisten.
-  - Die Anwendung soll dem Benutzer das aktive Lernen durch Karteikarten ermöglichen.
+  - Volltextsuche für Dokumente anhand von Titel, Inhalt oder Schlagwörtern implementieren.
+  - Logging und grundlegende Fehlerbehandlung integrieren.
+  - Rudimentäre Benutzerverwaltung als Platzhalter für spätere Erweiterungen.
+
+     
     
 - **Could Have:**
-  - Eine rudimentäre Benutzerverwaltung (nur als Platzhalter für spätere Erweiterungen) kann integriert werden.
-  - Weitere Möglichkeiten dem Benutzer aktiv beim lernen zu helfen, etwa Quizzes.
+  - Weitere Lernfeatures wie Quizzes hinzufügen. 
+  - Speicherung von Fortschritten und Statistiken zu den Kursen und Karteikarten eines Benutzers.
 
 - **Won't Have:**
   - Es wird keine vollwertige Frontend-Benutzeroberfläche entwickelt – der Fokus liegt auf der Backend-Implementierung und der REST-API.
@@ -37,6 +42,6 @@ Hier ist das momentane Klassendiagramm
 
 
 **Techstack**
-- FastAPI
-- MongoDB
-- Docker
+- Backend: FastAPI für die Implementierung der REST-Schnittstelle.
+- Datenbank: MongoDB als NoSQL-Datenbank.
+- Containerisierung: Docker für die Verwaltung des Services.
