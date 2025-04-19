@@ -6,15 +6,15 @@ class KarteikarteBase(BaseModel):
     frage: str
     antwort: str
     kategorie: str
-    dokument_id: Optional[int] = None   
-    topic_id: Optional[int] = None      
-    kurs_id: Optional[int] = None       
+    dokument_id: Optional[str] = None   
+    topic_id: Optional[str] = None      
+    kurs_id: Optional[str] = None       
 
 class KarteikarteCreate(KarteikarteBase):
     pass
 
 class Karteikarte(KarteikarteBase):
-    kartei_id: int
+    kartei_id: str
     erstellungsdatum: datetime
 
     class Config:

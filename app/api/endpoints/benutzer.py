@@ -1,39 +1,57 @@
-from fastapi import APIRouter, HTTPException, status
-from typing import Dict
+from fastapi import APIRouter, HTTPException, status, Depends
+from bson import ObjectId
+from pymongo import ReturnDocument
 from schemas.benutzer_schema import Benutzer, BenutzerCreate
+from db.mongo import get_database
 
 router = APIRouter()
 
-benutzer_db: Dict[int, dict] = {}
-next_id = 1
-
 @router.post("/", response_model=Benutzer, status_code=status.HTTP_201_CREATED)
-def create_benutzer(benutzer: BenutzerCreate):
-    global next_id
-    new_benutzer = benutzer.dict()
-    new_benutzer['benutzer_id'] = next_id
-    benutzer_db[next_id] = new_benutzer
-    next_id += 1
-    return new_benutzer
+async def create_benutzer(
+    benutzer: BenutzerCreate,
+    db=Depends(get_database)
+):
+    data = benutzer.dict()
+    result = await db.users.insert_one(data)                           
+    created = await db.users.find_one({"_id": result.inserted_id})
+    created["benutzer_id"] = str(created.pop("_id"))
+    print("created:", created)
+    return created
 
 @router.get("/{benutzer_id}", response_model=Benutzer)
-def read_benutzer(benutzer_id: int):
-    if benutzer_id not in benutzer_db:
+async def read_benutzer(
+    benutzer_id: str,
+    db=Depends(get_database)
+):
+    record = await db.users.find_one({"_id": ObjectId(benutzer_id)})
+    if not record:
         raise HTTPException(status_code=404, detail="Benutzer nicht gefunden")
-    return benutzer_db[benutzer_id]
+    record["benutzer_id"] = str(record.pop("_id"))
+    return record
 
 @router.put("/{benutzer_id}", response_model=Benutzer)
-def update_benutzer(benutzer_id: int, benutzer: BenutzerCreate):
-    if benutzer_id not in benutzer_db:
-        raise HTTPException(status_code=404, detail="Benutzer nicht gefunden")
+async def update_benutzer(
+    benutzer_id: str,
+    benutzer: BenutzerCreate,
+    db=Depends(get_database)
+):
     updated = benutzer.dict()
-    updated['benutzer_id'] = benutzer_id
-    benutzer_db[benutzer_id] = updated
-    return updated
+    result = await db.users.find_one_and_replace(
+        {"_id": ObjectId(benutzer_id)},
+        updated,
+        return_document=ReturnDocument.AFTER
+    )
+    if not result:
+        raise HTTPException(status_code=404, detail="Benutzer nicht gefunden")
+    result["benutzer_id"] = str(result.pop("_id"))
+    return result
 
 @router.delete("/{benutzer_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_benutzer(benutzer_id: int):
-    if benutzer_id not in benutzer_db:
+async def delete_benutzer(
+    benutzer_id: str,
+    db=Depends(get_database)
+):
+    delete_result = await db.users.delete_one({"_id": ObjectId(benutzer_id)})
+    if delete_result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Benutzer nicht gefunden")
-    del benutzer_db[benutzer_id]
     return

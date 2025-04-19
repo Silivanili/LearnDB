@@ -1,42 +1,62 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from datetime import datetime
-from typing import Dict
+from bson import ObjectId
+from pymongo import ReturnDocument
 from schemas.karteikarte_schema import Karteikarte, KarteikarteCreate
+from db.mongo import get_database
 
 router = APIRouter()
 
-karteikarte_db: Dict[int, dict] = {}
-next_id = 1
-
 @router.post("/", response_model=Karteikarte, status_code=status.HTTP_201_CREATED)
-def create_karteikarte(karteikarte: KarteikarteCreate):
-    global next_id
-    new_karteikarte = karteikarte.dict()
-    new_karteikarte['kartei_id'] = next_id
-    new_karteikarte['erstellungsdatum'] = datetime.utcnow()
-    karteikarte_db[next_id] = new_karteikarte
-    next_id += 1
-    return new_karteikarte
+async def create_karteikarte(
+    karteikarte: KarteikarteCreate,
+    db=Depends(get_database)
+):
+    data = karteikarte.dict()
+    data["erstellungsdatum"] = datetime.utcnow()
+    result = await db.flashcards.insert_one(data)                      
+    created = await db.flashcards.find_one({"_id": result.inserted_id})
+    created["kartei_id"] = str(created.pop("_id"))
+    print("created:", created)
+    return created
 
 @router.get("/{kartei_id}", response_model=Karteikarte)
-def read_karteikarte(kartei_id: int):
-    if kartei_id not in karteikarte_db:
+async def read_karteikarte(
+    kartei_id: str,
+    db=Depends(get_database)
+):
+    record = await db.flashcards.find_one({"_id": ObjectId(kartei_id)})
+    if not record:
         raise HTTPException(status_code=404, detail="Karteikarte nicht gefunden")
-    return karteikarte_db[kartei_id]
+    record["kartei_id"] = str(record.pop("_id"))
+    return record
 
 @router.put("/{kartei_id}", response_model=Karteikarte)
-def update_karteikarte(kartei_id: int, karteikarte: KarteikarteCreate):
-    if kartei_id not in karteikarte_db:
-        raise HTTPException(status_code=404, detail="Karteikarte nicht gefunden")
+async def update_karteikarte(
+    kartei_id: str,
+    karteikarte: KarteikarteCreate,
+    db=Depends(get_database)
+):
     updated = karteikarte.dict()
-    updated['kartei_id'] = kartei_id
-    updated['erstellungsdatum'] = karteikarte_db[kartei_id]['erstellungsdatum']
-    karteikarte_db[kartei_id] = updated
-    return updated
+    updated["erstellungsdatum"] = (await db.flashcards.find_one(
+        {"_id": ObjectId(kartei_id)}, {"erstellungsdatum": 1}
+    ))["erstellungsdatum"]
+    result = await db.flashcards.find_one_and_replace(
+        {"_id": ObjectId(kartei_id)},
+        updated,
+        return_document=ReturnDocument.AFTER
+    )
+    if not result:
+        raise HTTPException(status_code=404, detail="Karteikarte nicht gefunden")
+    result["kartei_id"] = str(result.pop("_id"))
+    return result
 
 @router.delete("/{kartei_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_karteikarte(kartei_id: int):
-    if kartei_id not in karteikarte_db:
+async def delete_karteikarte(
+    kartei_id: str,
+    db=Depends(get_database)
+):
+    delete_result = await db.flashcards.delete_one({"_id": ObjectId(kartei_id)})
+    if delete_result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Karteikarte nicht gefunden")
-    del karteikarte_db[kartei_id]
     return

@@ -8,7 +8,7 @@ class AutorCreate(AutorBase):
     pass
 
 class Autor(AutorBase):
-    autor_id: int
+    autor_id: str
 
     class Config:
         orm_mode = True

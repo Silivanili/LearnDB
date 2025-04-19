@@ -8,7 +8,7 @@ class BenutzerCreate(BenutzerBase):
     pass
 
 class Benutzer(BenutzerBase):
-    benutzer_id: int
+    benutzer_id: str
 
     class Config:
         orm_mode = True

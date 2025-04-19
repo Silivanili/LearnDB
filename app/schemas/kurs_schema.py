@@ -11,7 +11,7 @@ class KursCreate(KursBase):
     pass
 
 class Kurs(KursBase):
-    kurs_id: int
+    kurs_id: str
     Zeit: datetime
 
     class Config:

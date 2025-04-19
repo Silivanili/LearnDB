@@ -1,39 +1,56 @@
-from fastapi import APIRouter, HTTPException, status
-from typing import Dict
+from fastapi import APIRouter, HTTPException, status, Depends
+from bson import ObjectId
+from pymongo import ReturnDocument
 from schemas.topic_schema import Topic, TopicCreate
+from db.mongo import get_database
 
 router = APIRouter()
 
-topic_db: Dict[int, dict] = {}
-next_id = 1
-
 @router.post("/", response_model=Topic, status_code=status.HTTP_201_CREATED)
-def create_topic(topic: TopicCreate):
-    global next_id
-    new_topic = topic.dict()
-    new_topic['topic_id'] = next_id
-    topic_db[next_id] = new_topic
-    next_id += 1
-    return new_topic
+async def create_topic(
+    topic: TopicCreate,
+    db=Depends(get_database)
+):
+    data = topic.dict()
+    result = await db.topics.insert_one(data)                          
+    created = await db.topics.find_one({"_id": result.inserted_id})
+    created["topic_id"] = str(created.pop("_id"))
+    print("created:", created)
+    return created
 
 @router.get("/{topic_id}", response_model=Topic)
-def read_topic(topic_id: int):
-    if topic_id not in topic_db:
+async def read_topic(
+    topic_id: str,
+    db=Depends(get_database)
+):
+    record = await db.topics.find_one({"_id": ObjectId(topic_id)})
+    if not record:
         raise HTTPException(status_code=404, detail="Topic nicht gefunden")
-    return topic_db[topic_id]
+    record["topic_id"] = str(record.pop("_id"))
+    return record
 
 @router.put("/{topic_id}", response_model=Topic)
-def update_topic(topic_id: int, topic: TopicCreate):
-    if topic_id not in topic_db:
+async def update_topic(
+    topic_id: str,
+    topic: TopicCreate,
+    db=Depends(get_database)
+):
+    result = await db.topics.find_one_and_replace(
+        {"_id": ObjectId(topic_id)},
+        topic.dict(),
+        return_document=ReturnDocument.AFTER
+    )
+    if not result:
         raise HTTPException(status_code=404, detail="Topic nicht gefunden")
-    updated = topic.dict()
-    updated['topic_id'] = topic_id
-    topic_db[topic_id] = updated
-    return updated
+    result["topic_id"] = str(result.pop("_id"))
+    return result
 
 @router.delete("/{topic_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_topic(topic_id: int):
-    if topic_id not in topic_db:
+async def delete_topic(
+    topic_id: str,
+    db=Depends(get_database)
+):
+    delete_result = await db.topics.delete_one({"_id": ObjectId(topic_id)})
+    if delete_result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Topic nicht gefunden")
-    del topic_db[topic_id]
     return

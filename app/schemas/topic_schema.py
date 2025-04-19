@@ -8,7 +8,7 @@ class TopicCreate(TopicBase):
     pass
 
 class Topic(TopicBase):
-    topic_id: int
+    topic_id: str
 
     class Config:
         orm_mode = True
