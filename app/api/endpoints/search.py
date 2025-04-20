@@ -11,7 +11,7 @@ async def search_documents(
     query: str = Query(..., min_length=1),
     db=Depends(get_database)
 ):
-    cursor = db.documents.find(         # Führt eine Textsuche in den Dokumenten durch.
+    cursor = db.dokumente.find(         # Führt eine Textsuche in den Dokumenten durch.
         {"$text": {"$search": query}},
         {"score": {"$meta": "textScore"}}
     ).sort([("score", {"$meta": "textScore"})])

@@ -14,8 +14,8 @@ async def create_karteikarte(
 ):
     data = karteikarte.dict()
     data["erstellungsdatum"] = datetime.utcnow()
-    result = await db.flashcards.insert_one(data)                      
-    created = await db.flashcards.find_one({"_id": result.inserted_id})
+    result = await db.karteikarten.insert_one(data)                      
+    created = await db.karteikarten.find_one({"_id": result.inserted_id})
     created["kartei_id"] = str(created.pop("_id"))
     print("created:", created)
     return created
@@ -25,7 +25,7 @@ async def read_karteikarte(
     kartei_id: str,
     db=Depends(get_database)
 ):
-    record = await db.flashcards.find_one({"_id": ObjectId(kartei_id)})
+    record = await db.karteikarten.find_one({"_id": ObjectId(kartei_id)})
     if not record:
         raise HTTPException(status_code=404, detail="Karteikarte nicht gefunden")
     record["kartei_id"] = str(record.pop("_id"))
@@ -38,10 +38,10 @@ async def update_karteikarte(
     db=Depends(get_database)
 ):
     updated = karteikarte.dict()
-    updated["erstellungsdatum"] = (await db.flashcards.find_one(
+    updated["erstellungsdatum"] = (await db.karteikarten.find_one(
         {"_id": ObjectId(kartei_id)}, {"erstellungsdatum": 1}
     ))["erstellungsdatum"]
-    result = await db.flashcards.find_one_and_replace(
+    result = await db.karteikarten.find_one_and_replace(
         {"_id": ObjectId(kartei_id)},
         updated,
         return_document=ReturnDocument.AFTER
@@ -56,7 +56,7 @@ async def delete_karteikarte(
     kartei_id: str,
     db=Depends(get_database)
 ):
-    delete_result = await db.flashcards.delete_one({"_id": ObjectId(kartei_id)})
+    delete_result = await db.karteikarten.delete_one({"_id": ObjectId(kartei_id)})
     if delete_result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Karteikarte nicht gefunden")
     return

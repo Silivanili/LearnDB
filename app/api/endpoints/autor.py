@@ -13,8 +13,8 @@ async def create_autor(
     db=Depends(get_database)
 ):
     data = autor.dict()                             #Konvertiert Pydantic in ein normales Dict, weil MongoDB es sonst nicht handlen kann. Dann wird es gespeichert. Die ID muss konvertiert werden weil MongoDB diese so erwartet.                                          
-    result = await db.autors.insert_one(data)                          
-    created = await db.autors.find_one({"_id": result.inserted_id})
+    result = await db.autoren.insert_one(data)                          
+    created = await db.autoren.find_one({"_id": result.inserted_id})
     created["autor_id"] = str(created.pop("_id"))
     print("created:", created)
     return created
@@ -24,7 +24,7 @@ async def read_autor(
     autor_id: str,
     db=Depends(get_database)
 ):
-    record = await db.autors.find_one({"_id": ObjectId(autor_id)})      
+    record = await db.autoren.find_one({"_id": ObjectId(autor_id)})      
     if not record:
         raise HTTPException(status_code=404, detail="Autor nicht gefunden")
     record["autor_id"] = str(record.pop("_id"))
@@ -37,7 +37,7 @@ async def update_autor(
     db=Depends(get_database)
 ):
     updated = autor.dict()
-    result = await db.autors.find_one_and_replace(
+    result = await db.autoren.find_one_and_replace(
         {"_id": ObjectId(autor_id)},
         updated,
         return_document=ReturnDocument.AFTER                              
@@ -52,7 +52,7 @@ async def delete_autor(
     autor_id: str,
     db=Depends(get_database)
 ):
-    delete_result = await db.autors.delete_one({"_id": ObjectId(autor_id)})  
+    delete_result = await db.autoren.delete_one({"_id": ObjectId(autor_id)})  
     if delete_result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Autor nicht gefunden")
     return

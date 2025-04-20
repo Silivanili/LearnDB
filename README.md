@@ -8,6 +8,70 @@ Die folgenden Use Cases sind geplant:
 - Karteikarten: Ein Benutzer erstellt Karteikarten basierend auf einem Dokument oder Topic eines Kurses und nutzt diese zum Lernen.
 - Suche: Ein Benutzer gibt einen Suchbegriff ein und erhält eine Liste von Dokumenten, die zu diesem Begriff passen.
          
+**Installation**
+Um dieses Projekt lokal auszuführen muss man es klonen, im Ordner 'learndb' eine eigene .env Datei erstellen und dann mit Docker ausführen. MongoDB muss installiert sein. Das heisst: 
+
+git clone https://github.com/Silivanili/LearnDB.git
+
+cd LearnDB
+
+Im Ordner 'learndb' eine Datei namens '.env' mit diesem Inhalt erstellen: 
+PROJECT_NAME=LearnDB
+MONGODB_URL=mongodb://mongodb:27017/
+MONGODB_DATABASE=learn_db
+MONGODB_COLLECTION=documents
+
+
+docker-compose up --build
+
+**Data Dump**
+
+Zunächst müssen die Testdaten in den Container kommen. Dazu diesen Befehl (im Ordner app) ausführen
+
+docker cp ./mongo-dump learndb-mongodb-1:/data/dump
+
+Dannach können die Daten importiert werden
+
+docker exec -it learndb-mongodb-1 mongodump --uri="mongodb://mongodb:27017" --out=/data/dump
+
+
+
+**API Dokumentation**
+
+Dieses Projekt benutzt SwaggerUI, womit die API getestet werden kann. Hier ein Beispiel für ein Dokument: 
+
+Dokumente erstellen: 
+
+curl -X POST "http://localhost:8888/api/dokument/" \
+    -H "Content-Type: application/json" \
+    -d '{
+      "titel": "NoSQL Grundlagen",
+      "beschreibung": "Ein Überblick über NoSQL-Datenbanken",
+      "inhalt": "MongoDB, CouchDB und mehr...",
+      "schlagworte": ["NoSQL", "Datenbanken", "MongoDB"],
+      "kurs": "Einführungskurs"
+    }'
+
+Ein Dokument einlesen: 
+
+curl http://localhost:8888/api/dokument/{document_id}
+
+Ein Dokument updaten: 
+
+curl -X PUT "http://localhost:8888/api/dokument/{document_id}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "titel": "NoSQL Basics (aktualisiert)",
+    "beschreibung": "Überblick über NoSQL-Systeme",
+    "inhalt": "MongoDB und andere NoSQL-Datenbanken...",
+    "schlagworte": ["NoSQL", "MongoDB", "CouchDB"],
+    "kurs": "Einführungskurs"
+  }'
+
+Ein Dokument löschen: 
+
+curl -X DELETE http://localhost:8888/api/dokument/{document_id}
+
 
 **MSCW-Kriterien**
 
@@ -42,6 +106,6 @@ Hier ist das momentane Klassendiagramm
 
 
 **Techstack**
-- Backend: FastAPI für die Implementierung der REST-Schnittstelle.
+- Backend: FastAPI für die Implementierung der REST-Schnittstelle. Pydantic für die Validierung und SwaggerUI für das testen.
 - Datenbank: MongoDB als NoSQL-Datenbank.
 - Containerisierung: Docker für die Verwaltung des Services.

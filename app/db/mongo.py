@@ -15,7 +15,7 @@ async def connect_to_mongo():   #Verbinde mit MongoDB mit URL aus dem .env file.
     db = client[MONGODB_DB]
 
 async def ensure_text_indexes():    #Erstelle Textindex für die Dokumente, für Textsuche.
-    await db.documents.create_index(
+    await db.dokumente.create_index(
         [
             ("titel", "text"),
             ("beschreibung", "text"),

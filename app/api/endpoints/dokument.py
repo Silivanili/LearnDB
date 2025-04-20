@@ -13,8 +13,8 @@ async def create_dokument(
 ):
     doc = dokument.dict()
     doc["erstellungsdatum"] = datetime.utcnow()
-    result = await db.documents.insert_one(doc)     
-    created = await db.documents.find_one({"_id": result.inserted_id})
+    result = await db.dokumente.insert_one(doc)     
+    created = await db.dokumente.find_one({"_id": result.inserted_id})
     created["document_id"] = str(created.pop("_id"))
     print("created:", created)
     return created
@@ -24,7 +24,7 @@ async def read_dokument(
     document_id: str,
     db=Depends(get_database)
 ):
-    record = await db.documents.find_one({"_id": ObjectId(document_id)})  
+    record = await db.dokumente.find_one({"_id": ObjectId(document_id)})  
     if not record:
         raise HTTPException(status_code=404, detail="Dokument erstellt")
     record["document_id"] = str(record.pop("_id"))
@@ -37,10 +37,10 @@ async def update_dokument(
     db=Depends(get_database)
 ):
     updated_data = dokument.dict()
-    updated_data["erstellungsdatum"] = (await db.documents.find_one(
+    updated_data["erstellungsdatum"] = (await db.dokumente.find_one(
         {"_id": ObjectId(document_id)}, {"erstellungsdatum": 1}
     ))["erstellungsdatum"]
-    result = await db.documents.find_one_and_replace(
+    result = await db.dokumente.find_one_and_replace(
         {"_id": ObjectId(document_id)},
         updated_data,
         return_document=ReturnDocument.AFTER               
@@ -55,7 +55,7 @@ async def delete_dokument(
     document_id: str,
     db=Depends(get_database)
 ):
-    delete_result = await db.documents.delete_one({"_id": ObjectId(document_id)})
+    delete_result = await db.dokumente.delete_one({"_id": ObjectId(document_id)})
     if delete_result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Dokument nicht gefunden")
     return

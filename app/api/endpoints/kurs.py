@@ -14,8 +14,8 @@ async def create_kurs(
 ):
     data = kurs.dict()
     data["Zeit"] = datetime.utcnow()
-    result = await db.courses.insert_one(data)                         
-    created = await db.courses.find_one({"_id": result.inserted_id})
+    result = await db.kurse.insert_one(data)                         
+    created = await db.kurse.find_one({"_id": result.inserted_id})
     created["kurs_id"] = str(created.pop("_id"))
     print("created:", created)
     return created
@@ -25,7 +25,7 @@ async def read_kurs(
     kurs_id: str,
     db=Depends(get_database)
 ):
-    record = await db.courses.find_one({"_id": ObjectId(kurs_id)})
+    record = await db.kurse.find_one({"_id": ObjectId(kurs_id)})
     if not record:
         raise HTTPException(status_code=404, detail="Kurs nicht gefunden")
     record["kurs_id"] = str(record.pop("_id"))
@@ -38,10 +38,10 @@ async def update_kurs(
     db=Depends(get_database)
 ):
     updated = kurs.dict()
-    updated["Zeit"] = (await db.courses.find_one(
+    updated["Zeit"] = (await db.kurse.find_one(
         {"_id": ObjectId(kurs_id)}, {"Zeit": 1}
     ))["Zeit"]
-    result = await db.courses.find_one_and_replace(
+    result = await db.kurse.find_one_and_replace(
         {"_id": ObjectId(kurs_id)},
         updated,
         return_document=ReturnDocument.AFTER
@@ -56,7 +56,7 @@ async def delete_kurs(
     kurs_id: str,
     db=Depends(get_database)
 ):
-    delete_result = await db.courses.delete_one({"_id": ObjectId(kurs_id)})
+    delete_result = await db.kurse.delete_one({"_id": ObjectId(kurs_id)})
     if delete_result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Kurs nicht gefunden")
     return

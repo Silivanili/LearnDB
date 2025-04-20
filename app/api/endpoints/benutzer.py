@@ -12,8 +12,8 @@ async def create_benutzer(
     db=Depends(get_database)
 ):
     data = benutzer.dict()
-    result = await db.users.insert_one(data)                           
-    created = await db.users.find_one({"_id": result.inserted_id})
+    result = await db.benutzer.insert_one(data)                           
+    created = await db.benutzer.find_one({"_id": result.inserted_id})
     created["benutzer_id"] = str(created.pop("_id"))
     print("created:", created)
     return created
@@ -23,7 +23,7 @@ async def read_benutzer(
     benutzer_id: str,
     db=Depends(get_database)
 ):
-    record = await db.users.find_one({"_id": ObjectId(benutzer_id)})
+    record = await db.benutzer.find_one({"_id": ObjectId(benutzer_id)})
     if not record:
         raise HTTPException(status_code=404, detail="Benutzer nicht gefunden")
     record["benutzer_id"] = str(record.pop("_id"))
@@ -36,7 +36,7 @@ async def update_benutzer(
     db=Depends(get_database)
 ):
     updated = benutzer.dict()
-    result = await db.users.find_one_and_replace(
+    result = await db.benutzer.find_one_and_replace(
         {"_id": ObjectId(benutzer_id)},
         updated,
         return_document=ReturnDocument.AFTER
@@ -51,7 +51,7 @@ async def delete_benutzer(
     benutzer_id: str,
     db=Depends(get_database)
 ):
-    delete_result = await db.users.delete_one({"_id": ObjectId(benutzer_id)})
+    delete_result = await db.benutzer.delete_one({"_id": ObjectId(benutzer_id)})
     if delete_result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Benutzer nicht gefunden")
     return
