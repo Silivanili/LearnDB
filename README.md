@@ -16,10 +16,13 @@ git clone https://github.com/Silivanili/LearnDB.git
 cd LearnDB
 
 Im Ordner 'learndb' eine Datei namens '.env' mit diesem Inhalt erstellen: 
+
+# .env
 PROJECT_NAME=LearnDB
 MONGODB_URL=mongodb://mongodb:27017/
 MONGODB_DATABASE=learn_db
-MONGODB_COLLECTION=documents
+MONGODB_COLLECTION=dokumente
+
 
 
 docker-compose up --build
