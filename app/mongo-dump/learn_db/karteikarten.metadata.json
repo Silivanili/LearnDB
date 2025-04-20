@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"189cf449c92545bcb9b9153d55613162","collectionName":"karteikarten","type":"collection"}
